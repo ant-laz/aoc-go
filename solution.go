@@ -18,18 +18,28 @@
 package main
 
 import (
-	// Import the popular fmt package, which contains functions for formatting text, including printing to the console.
+	// the fmt package, which contains functions for formatting text, including printing to the console.
 	// This package is one of the standard library packages you got when you installed Go.
 	// https://pkg.go.dev/fmt
 	"fmt"
-	// Import bufio package to be used to read text file
+	"strings"
+
+	// the bufio package is used to read text file
 	// This package is one of the standard library packages you got when you installed Go.
 	// https://pkg.go.dev/bufio#Scanner
 	"bufio"
-	// Used to access files on operating system
+	// the os package is used to open files on operating system
 	// This package is one of the standard library packages you got when you installed Go.
 	// https://pkg.go.dev/os
 	"os"
+	// the strconv package is used to convert from str to other types, e.g. int
+	// This package is one of the standard library packages you got when you installed Go.
+	// https://pkg.go.dev/
+	"strconv"
+	// the slices package is used to sort slices
+	// This package is one of the standard library packages you got when you installed Go.
+	// https://pkg.go.dev/slices
+	"slices"
 )
 
 // the main function, the entry point for the program
@@ -45,11 +55,47 @@ func main() {
 	// This ensure we do not "leak" connections to files
 	defer file.Close()
 
+	// Creating some Go int slices to hold the left & right list of numbers
+	// We know the capacity needs to be 1,000 because that's the number
+	/// of lines in the input text file
+	left := make([]int, 0, 1000)
+	right := make([]int, 0, 1000)
+
 	// Read the file one line at a time
+	// separate columnn entries, but splitting each line into two
+	// convert column entries from string to int
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		line := scanner.Text()
+		listentries := strings.Split(line, "   ")
+		l, _ := strconv.Atoi(listentries[0])
+		left = append(left, l)
+		r, _ := strconv.Atoi(listentries[1])
+		right = append(right, r)
 	}
+
+	// sort the right & left values
+	slices.Sort(left)
+	slices.Sort(right)
+
+	// compute & sum the pairwise differences
+	diffsum := 0
+	for idx, _ := range left {
+		diff := 0
+		leftval := left[idx]
+		rightval := right[idx]
+		if leftval >= rightval {
+			diff = leftval - rightval
+		} else {
+			diff = rightval - leftval
+		}
+		diffsum += diff
+		fmt.Println("idx = ", idx, "sum = ", diffsum, "left[idx] = ", leftval, "right[idx] = ", rightval)
+	}
+
+	// return the sum
+
+	fmt.Println("the answer is = ", diffsum)
 
 }
 
