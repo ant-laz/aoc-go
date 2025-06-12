@@ -19,16 +19,45 @@ package main
 
 import (
 	// Import the popular fmt package, which contains functions for formatting text, including printing to the console.
-	// https://pkg.go.dev/fmt
 	// This package is one of the standard library packages you got when you installed Go.
-	// https://pkg.go.dev/std
+	// https://pkg.go.dev/fmt
 	"fmt"
+	// Import bufio package to be used to read text file
+	// This package is one of the standard library packages you got when you installed Go.
+	// https://pkg.go.dev/bufio#Scanner
+	"bufio"
+	// Used to access files on operating system
+	// This package is one of the standard library packages you got when you installed Go.
+	// https://pkg.go.dev/os
+	"os"
 )
 
 // the main function, the entry point for the program
 // on the terminal running go run . will start execution here
 func main() {
-	// PrintLn function from package fmt
-	// https://pkg.go.dev/fmt#Println
-	fmt.Println("Solution is working")
+	// Open the file with the puzzle input
+	// check for errors
+	file, err := os.Open("input.txt")
+	checkError(err)
+
+	// We defer the closing of that file with closeFile.
+	// This will be executed at the end of the enclosing function (main)
+	// This ensure we do not "leak" connections to files
+	defer file.Close()
+
+	// Read the file one line at a time
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+
+}
+
+// utilty function to help handle errors that could occur
+// error is a built-in type in Go
+// panic is a built-in function in Go
+func checkError(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
